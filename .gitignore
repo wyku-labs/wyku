@@ -1,0 +1,21 @@
+# Rust
+/target
+
+# Nix
+.direnv/
+.envrc
+result
+result-*
+
+# IDEs
+.vscode/
+.idea/
+.zed/
+*.swp
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
