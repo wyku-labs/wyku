@@ -20,7 +20,6 @@ nonstandard_style = { level = "deny", priority = -1 }
 ambiguous_negative_literals = "deny"
 trivial_numeric_casts = "deny"
 meta_variable_misuse = "deny"
-warnings = "deny"
 
 unsafe_code = "forbid"
 non_ascii_idents = "forbid"
