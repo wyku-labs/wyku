@@ -18,3 +18,28 @@ impl Id {
         Id(id.to_string())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn invalid_ids() {
+        let ids = vec!["Hello World", "Tooling", "Ñ", "Agent"];
+
+        for i in ids {
+            let id = Id::new(i);
+            assert!(id.is_err())
+        }
+    }
+
+    #[test]
+    fn valid_ids() {
+        let ids = vec!["main", "check", "worker", "agent"];
+
+        for i in ids {
+            let id = Id::new(i);
+            assert!(id.is_ok())
+        }
+    }
+}
