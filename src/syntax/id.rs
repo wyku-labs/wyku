@@ -13,9 +13,13 @@ impl Id {
 
     pub(crate) fn new_with_exception(id: &str, exception: Option<String>) -> Result<Id, String> {
         let pattern_exception = exception.as_deref().unwrap_or("");
-
         let pattern = format!(r"^[a-z_-{pattern_exception}]+$");
-        let id_regex = Regex::new(&pattern).expect("Invalid ID Regex");
+
+        let Ok(id_regex) = Regex::new(&pattern) else {
+            return Err(format!(
+                "Invalid Regex '{pattern}', Supplied Exception '{pattern_exception}'"
+            ));
+        };
 
         if !id_regex.is_match(&id) {
             return Err(format!("Invalid ID, Must Match '{pattern}'"));
