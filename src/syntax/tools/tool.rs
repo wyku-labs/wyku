@@ -1,3 +1,5 @@
+use super::super::id::Id;
+
 #[derive(Debug)]
 enum Arg {
     Tool(Tool),
@@ -6,6 +8,6 @@ enum Arg {
 
 #[derive(Debug)]
 pub(crate) struct Tool {
-    name: String,
+    name: Id,
     args: Vec<Arg>,
 }
