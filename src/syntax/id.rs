@@ -1,21 +1,29 @@
 use regex::Regex;
 
-struct Id(String);
+pub(crate) struct Id {
+    id: String,
+    exception: Option<String>, // Stored Only For Debugging
+}
 
 impl Id {
     pub(crate) fn new(id: &str) -> Result<Id, String> {
-        let pattern = r"^[a-z_-]+$";
-        let id_regex = Regex::new(pattern).expect("Invalid ID Regex");
+        Id::new_with_exception(id, None::<String>)
+    }
+
+    pub(crate) fn new_with_exception(id: &str, exception: Option<String>) -> Result<Id, String> {
+        let pattern_exception = exception.as_deref().unwrap_or("");
+
+        let pattern = format!(r"^[a-z_-{pattern_exception}]+$");
+        let id_regex = Regex::new(&pattern).expect("Invalid ID Regex");
 
         if !id_regex.is_match(&id) {
             return Err(format!("Invalid ID, Must Match '{pattern}'"));
         }
 
-        Ok(Id(id.to_string()))
-    }
-
-    pub(crate) fn force(id: &str) -> Id {
-        Id(id.to_string())
+        Ok(Id {
+            id: id.to_string(),
+            exception,
+        })
     }
 }
 
