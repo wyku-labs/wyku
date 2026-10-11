@@ -1,4 +1,5 @@
 use super::super::id::Id;
+use super::super::tools::tool::Tool;
 use super::when::When;
 
 use regex::Regex;
@@ -15,6 +16,6 @@ pub(crate) struct Unit {
     runner: Runner,
     task: String,
     when: When,
-    tools: Vec<(Id, Regex)>,
+    tools: Vec<(Tool, Regex)>,
     ok: bool,
 }

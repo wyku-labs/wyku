@@ -1,9 +1,10 @@
+use super::super::tools::tool::Tool;
 use super::unit::Unit;
 
 #[derive(Debug)]
 enum Subject {
     Unit(Box<Unit>),
-    Tool(String),
+    Tool(Tool),
 }
 
 #[derive(Debug)]
