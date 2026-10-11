@@ -1,5 +1,6 @@
 use regex::Regex;
 
+#[derive(Debug, PartialEq)]
 pub(crate) struct Id {
     id: String,
     exception: Option<String>, // Stored Only For Debugging
