@@ -1,3 +1,3 @@
-mod unit;
+pub(crate) mod unit;
 
 mod when;
