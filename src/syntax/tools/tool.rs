@@ -1,4 +1,4 @@
-use super::super::id::Id;
+use crate::syntax::Id;
 
 #[derive(Debug)]
 enum Arg {

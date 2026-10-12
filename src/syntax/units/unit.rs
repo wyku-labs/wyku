@@ -1,6 +1,6 @@
-use super::super::id::Id;
-use super::super::tools::tool::Tool;
-use super::when::When;
+use super::When;
+use crate::syntax::Id;
+use crate::syntax::Tool;
 
 use regex::Regex;
 

@@ -1,5 +1,5 @@
-use super::tools::tool::Tool;
-use super::units::unit::Unit;
+use crate::syntax::Tool;
+use crate::syntax::Unit;
 
 pub(crate) enum Syntaxes {
     Unit(Unit),

@@ -1,5 +1,5 @@
-use super::super::tools::tool::Tool;
-use super::unit::Unit;
+use crate::syntax::Tool;
+use crate::syntax::Unit;
 
 #[derive(Debug)]
 enum Subject {
