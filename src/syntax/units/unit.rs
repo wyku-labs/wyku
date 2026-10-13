@@ -7,13 +7,13 @@ use regex::Regex;
 #[derive(Debug)]
 pub(crate) struct Unit {
     id: Id,
-    task: String,
-    exec: Tool,
-    when: Expression,
-    tools: Vec<(Tool, Regex)>,
+    task: Option<String>,
+    exec: Option<Tool>,
+    when: Option<Expression>,
+    tools: Option<Vec<(Tool, Regex)>>,
 
     state: State,
-    ok: bool,
+    ok: Option<bool>,
 }
 
 #[derive(Debug)]
