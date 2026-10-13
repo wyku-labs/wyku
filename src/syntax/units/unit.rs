@@ -1,4 +1,4 @@
-use super::When::Expression;
+use super::when::Expression;
 use crate::syntax::Id;
 use crate::syntax::Tool;
 

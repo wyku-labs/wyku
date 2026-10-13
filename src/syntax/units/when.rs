@@ -16,7 +16,7 @@ enum Subject {
 }
 
 #[derive(Debug)]
-pub(crate) enum Expression {
+pub(super) enum Expression {
     Subject(Subject),
 
     NOT(Box<Expression>),
