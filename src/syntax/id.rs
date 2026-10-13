@@ -22,7 +22,7 @@ impl Id {
         };
 
         if !id_regex.is_match(&id) {
-            return Err(format!("Invalid ID, Must Match '{pattern}'"));
+            return Err(format!("Invalid ID '{id}', Must Match '{pattern}'"));
         }
 
         Ok(Id {
