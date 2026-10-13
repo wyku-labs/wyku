@@ -2,7 +2,7 @@ use crate::syntax::Tool;
 use crate::syntax::Unit;
 
 #[derive(Debug)]
-pub(super) enum Subject {
+enum Subject {
     Unit(Box<Unit>),
     Tool(Tool),
 }
