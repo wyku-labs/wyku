@@ -17,6 +17,3 @@ pub(crate) enum Expression {
     OR([Box<Expression>; 2]),
     XOR([Box<Expression>; 2]),
 }
-
-#[derive(Debug)]
-pub(crate) struct When(Expression);

@@ -1,4 +1,4 @@
-use super::When;
+use super::When::Expression;
 use crate::syntax::Id;
 use crate::syntax::Tool;
 
@@ -15,7 +15,7 @@ pub(crate) struct Unit {
     id: Id,
     runner: Runner,
     task: String,
-    when: When,
+    when: Expression,
     tools: Vec<(Tool, Regex)>,
     ok: bool,
 }
