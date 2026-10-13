@@ -1,3 +1,3 @@
 pub(crate) mod parsable;
 
-pub(crate) use parsable as Parsable;
+pub(crate) use parsable::Parsable;

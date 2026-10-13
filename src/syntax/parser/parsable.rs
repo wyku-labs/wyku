@@ -3,12 +3,7 @@ use crate::syntax::Unit;
 
 use toml::Value as Toml;
 
-pub(crate) enum Syntaxes {
-    Unit(Unit),
-    Tool(Tool),
-}
-
-pub(crate) trait Parsable {
-    fn parser(toml: Toml) -> Result<Syntaxes, String>;
-    fn linter(toml: Toml) -> Result<Syntaxes, String>;
+pub(crate) trait Parsable<T> {
+    fn parser(toml: Toml) -> Result<T, String>;
+    fn linter(toml: Toml) -> Result<T, String>;
 }
