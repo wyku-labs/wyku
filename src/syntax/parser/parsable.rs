@@ -1,7 +1,7 @@
 use crate::syntax::Tool;
 use crate::syntax::Unit;
 
-pub(crate) struct Toml(String); // Placeholder
+use toml::Value as Toml;
 
 pub(crate) enum Syntaxes {
     Unit(Unit),
