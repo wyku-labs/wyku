@@ -5,9 +5,15 @@ use crate::syntax::Tool;
 use regex::Regex;
 
 #[derive(Debug)]
-enum Runner {
-    Model,
-    Tool,
+pub(crate) struct Unit {
+    id: Id,
+    task: String,
+    exec: Tool,
+    when: Expression,
+    tools: Vec<(Tool, Regex)>,
+
+    state: State,
+    ok: bool,
 }
 
 #[derive(Debug)]
@@ -16,16 +22,4 @@ enum State {
     Finish,
     Fail,
     Watch,
-}
-
-#[derive(Debug)]
-pub(crate) struct Unit {
-    id: Id,
-    runner: Runner,
-    task: String,
-    when: Expression,
-    tools: Vec<(Tool, Regex)>,
-
-    state: State,
-    ok: bool,
 }
