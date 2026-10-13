@@ -2,8 +2,16 @@ use crate::syntax::Tool;
 use crate::syntax::Unit;
 
 #[derive(Debug)]
+enum State {
+    Start,
+    Finish,
+    Fail,
+    Watch,
+}
+
+#[derive(Debug)]
 enum Subject {
-    Unit(Box<Unit>),
+    Unit((Box<Unit>, State)),
     Tool(Tool),
 }
 
