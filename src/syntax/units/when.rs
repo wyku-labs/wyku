@@ -1,10 +1,9 @@
-use crate::syntax::Tool;
-use crate::syntax::Unit;
+use crate::syntax::Id;
 
 #[derive(Debug)]
 enum Subject {
-    Unit(Box<Unit>),
-    Tool(Tool),
+    Unit(Id),
+    Tool(Id),
 }
 
 #[derive(Debug)]
