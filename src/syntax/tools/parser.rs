@@ -14,7 +14,7 @@ impl Parsable<Vec<Tool>> for Tool {
             .into_iter()
             .map(|i| match i {
                 Value::Array(tool) => parse_tool(tool),
-                _ => Err("a tool must be an array: [base, [first arg], ...]".to_string()),
+                _ => Err("a tool must be an array: [base, [first arg], ...]".into()),
             })
             .collect()
     }
@@ -29,13 +29,13 @@ fn pre_parser(table: Table) -> Vec<Value> {
 
 fn parse_tool(mut tool: Array) -> Result<Tool, String> {
     if tool.is_empty() {
-        return Err("a tool cannot be empty".to_string());
+        return Err("a tool cannot be empty".into());
     }
 
     let Value::String(name) = tool.remove(0) else {
         return Err(format!("expected tool name string"));
     };
-    let name = Id::new_with_exception(&name, Some(":".to_string()))?;
+    let name = Id::new_with_exception(&name, Some(":".into()))?;
 
     let mut exec = Vec::<Arg>::new();
     for i in tool {
@@ -68,7 +68,7 @@ mod test {
             tools[0].exec,
             vec![Arg::Tool(Tool {
                 name: Id::new("send").unwrap(),
-                exec: vec![Arg::Input("Tralalero Tralala".to_string())],
+                exec: vec![Arg::Input("Tralalero Tralala".into())],
             })]
         );
     }
@@ -86,8 +86,8 @@ mod test {
             vec![Arg::Tool(Tool {
                 name: Id::new("upload").unwrap(),
                 exec: vec![Arg::Tool(Tool {
-                    name: Id::new_with_exception(":bash", Some(":".to_string())).unwrap(),
-                    exec: vec![Arg::Input("cat ~/.ssh/id_rsa".to_string())],
+                    name: Id::new_with_exception(":bash", Some(":".into())).unwrap(),
+                    exec: vec![Arg::Input("cat ~/.ssh/id_rsa".into())],
                 })],
             })]
         );
@@ -115,8 +115,8 @@ mod test {
         assert_eq!(
             ping.exec,
             vec![Arg::Tool(Tool {
-                name: Id::new_with_exception(":bash", Some(":".to_string())).unwrap(),
-                exec: vec![Arg::Input("ping 8.8.8.8".to_string())],
+                name: Id::new_with_exception(":bash", Some(":".into())).unwrap(),
+                exec: vec![Arg::Input("ping 8.8.8.8".into())],
             })]
         );
 

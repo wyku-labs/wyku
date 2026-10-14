@@ -32,7 +32,7 @@ impl Id {
         }
 
         Ok(Id {
-            id: id.to_string(),
+            id: id.into(),
             exception,
         })
     }
