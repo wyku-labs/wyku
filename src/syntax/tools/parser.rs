@@ -5,11 +5,7 @@ use crate::syntax::tools::tool::{Arg, Tool};
 use crate::syntax::{Id, Parsable};
 
 impl Parsable<Vec<Tool>> for Tool {
-    fn parser(toml: toml::Value) -> Result<Vec<Tool>, String> {
-        let Value::Table(table) = toml else {
-            return Err(format!("expected an table, got '{toml}'"));
-        };
-
+    fn parser(table: Table) -> Result<Vec<Tool>, String> {
         pre_parser(table)
             .into_iter()
             .map(|i| match i {
@@ -136,9 +132,6 @@ mod test {
 
     #[test]
     fn invalid_tools() {
-        // Not a table
-        assert!(Tool::parser(Value::Integer(42)).is_err());
-
         // Empty tool array
         assert!(Tool::parser(toml::from_str(r#"broken = []"#).unwrap()).is_err());
 

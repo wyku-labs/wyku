@@ -1,9 +1,9 @@
 use crate::syntax::Tool;
 use crate::syntax::Unit;
 
-use toml::Value;
+use toml::Table;
 
 pub(crate) trait Parsable<T> {
-    fn parser(toml: toml::Value) -> Result<T, String>;
+    fn parser(toml: Table) -> Result<T, String>;
     // fn linter(toml: toml::Value) -> Result<T, String>;
 }
