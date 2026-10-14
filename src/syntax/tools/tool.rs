@@ -1,13 +1,13 @@
 use crate::syntax::Id;
 
 #[derive(Debug)]
-enum Arg {
+pub(super) enum Arg {
     Tool(Tool),
-    Arg(String),
+    Input(String),
 }
 
 #[derive(Debug)]
 pub(crate) struct Tool {
-    name: Id,
-    args: Vec<Arg>,
+    pub(super) name: Id,
+    pub(super) exec: Vec<Arg>,
 }
