@@ -16,3 +16,10 @@ pub(super) enum Expression {
     OR([Box<Expression>; 2]),
     XOR([Box<Expression>; 2]),
 }
+
+impl Expression {
+    pub(super) fn parser(when: &str) -> Result<Expression, String> {
+        let id = Id::new(when)?;
+        Ok(Expression::Subject(Subject::Unit(id))) // TODO: To work
+    }
+}
