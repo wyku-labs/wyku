@@ -1,9 +1,15 @@
 use regex::Regex;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub(crate) struct Id {
     id: String,
     exception: Option<String>, // Stored Only For Debugging
+}
+
+impl PartialEq for Id {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
 }
 
 impl Id {
