@@ -1,4 +1,3 @@
-use super::permission::Permission;
 use super::when::Expression;
 
 use crate::syntax::Id;
@@ -12,7 +11,7 @@ pub(crate) struct Unit {
     task: Option<String>,
     exec: Option<Tool>,
     when: Option<Expression>,
-    tools: Option<Vec<Permission>>,
+    tools: Option<Vec<Id>>,
 
     state: State,
     ok: Option<bool>,

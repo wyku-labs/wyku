@@ -1,5 +1,4 @@
 mod parser;
-pub(crate) mod permission;
 pub(crate) mod unit;
 pub(crate) mod when;
 
