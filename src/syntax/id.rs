@@ -17,6 +17,10 @@ impl Id {
         Id::new_with_exception(id, None::<String>)
     }
 
+    pub(crate) fn new_tool(id: &str) -> Result<Id, String> {
+        Id::new_with_exception(id, Some(":".to_string()))
+    }
+
     pub(crate) fn new_with_exception(id: &str, exception: Option<String>) -> Result<Id, String> {
         let pattern_exception = regex::escape(exception.as_deref().unwrap_or(""));
         let pattern = format!(r"^[a-z_\-{pattern_exception}]+$");

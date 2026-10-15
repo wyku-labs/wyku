@@ -31,7 +31,7 @@ fn parse_tool(mut tool: Array) -> Result<Tool, String> {
     let Value::String(name) = tool.remove(0) else {
         return Err(format!("expected tool name string"));
     };
-    let name = Id::new_with_exception(&name, Some(":".into()))?;
+    let name = Id::new_tool(&name)?;
 
     let mut exec = Vec::<Arg>::new();
     for i in tool {
@@ -82,7 +82,7 @@ mod test {
             vec![Arg::Tool(Tool {
                 name: Id::new("upload").unwrap(),
                 exec: vec![Arg::Tool(Tool {
-                    name: Id::new_with_exception(":bash", Some(":".into())).unwrap(),
+                    name: Id::new_tool(":bash").unwrap(),
                     exec: vec![Arg::Input("cat ~/.ssh/id_rsa".into())],
                 })],
             })]
@@ -111,7 +111,7 @@ mod test {
         assert_eq!(
             ping.exec,
             vec![Arg::Tool(Tool {
-                name: Id::new_with_exception(":bash", Some(":".into())).unwrap(),
+                name: Id::new_tool(":bash").unwrap(),
                 exec: vec![Arg::Input("ping 8.8.8.8".into())],
             })]
         );
