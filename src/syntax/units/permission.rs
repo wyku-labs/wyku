@@ -34,3 +34,37 @@ impl Permission {
         })
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn twinkle() {
+        let permission = Permission::parser("*").unwrap();
+
+        assert!(permission.id.is_none());
+        assert!(permission.pattern.is_match(""));
+        assert!(permission.pattern.is_match("Tung Tung Tung Sahur"));
+    }
+
+    #[test]
+    fn bare_tool() {
+        for raw in ["read_file", ":bash"] {
+            let permission = Permission::parser(raw).unwrap();
+
+            assert_eq!(permission.id, Some(Id::new_tool(raw).unwrap()));
+            assert!(permission.pattern.is_match(""));
+            assert!(permission.pattern.is_match("Never gonna give you up"));
+        }
+    }
+
+    #[test]
+    fn scoped() {
+        let permission = Permission::parser(r"read_file(^/tmp/.*$)").unwrap();
+
+        assert_eq!(permission.id, Some(Id::new_tool("read_file").unwrap()));
+        assert!(permission.pattern.is_match("/tmp/a"));
+        assert!(!permission.pattern.is_match("/etc/a"));
+    }
+}
