@@ -2,7 +2,7 @@ use crate::syntax::Id;
 
 #[derive(Debug)]
 enum Subject {
-    Unit(Id),
+    Unit(Id, State),
     Tool(Id),
 }
 
@@ -28,6 +28,6 @@ pub(super) enum Expression {
 impl Expression {
     pub(super) fn parser(when: &str) -> Result<Expression, String> {
         let id = Id::new(when)?;
-        Ok(Expression::Subject(Subject::Unit(id))) // TODO: To work
+        Ok(Expression::Subject(Subject::Unit(id, State::Start))) // TODO: To work
     }
 }
