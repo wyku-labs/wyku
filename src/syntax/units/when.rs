@@ -40,7 +40,7 @@ impl Subject {
         if subject.contains(":") {
             if let Some(split) = subject.split_once(":") {
                 let (unit, state) = split;
-                return Ok(Subject::Unit(Id::new(unit)?, State::parse(state)?));
+                return Ok(Subject::Unit(Id::new(unit)?, State::parser(state)?));
             }
         }
 
@@ -49,7 +49,7 @@ impl Subject {
 }
 
 impl State {
-    pub(super) fn parse(state: &str) -> Result<Self, String> {
+    pub(super) fn parser(state: &str) -> Result<Self, String> {
         match state {
             "start" => Ok(Self::Start),
             "finish" => Ok(Self::Finish),
