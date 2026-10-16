@@ -31,6 +31,23 @@ impl Expression {
     }
 }
 
+impl Subject {
+    fn parser(subject: &str) -> Result<Subject, String> {
+        if subject.starts_with(":") || !subject.contains(":") {
+            return Ok(Subject::Tool(Id::new_tool(subject)?));
+        }
+
+        if subject.contains(":") {
+            if let Some(split) = subject.split_once(":") {
+                let (unit, state) = split;
+                return Ok(Subject::Unit(Id::new(unit)?, State::parse(state)?));
+            }
+        }
+
+        Err(format!("expected tool or unit subject, got {subject}"))
+    }
+}
+
 impl State {
     pub(super) fn parse(state: &str) -> Result<Self, String> {
         match state {
