@@ -1,13 +1,13 @@
 use crate::syntax::Id;
 
 #[derive(Debug)]
-enum Subject {
+pub(crate) enum Subject {
     Unit(Id, State),
     Tool(Id),
 }
 
 #[derive(Debug)]
-pub(super) enum State {
+pub(crate) enum State {
     Start,
     Finish,
     Fail,
@@ -15,7 +15,7 @@ pub(super) enum State {
 }
 
 #[derive(Debug)]
-pub(super) enum Expression {
+pub(crate) enum Expression {
     Subject(Subject),
 
     NOT(Box<Expression>),
