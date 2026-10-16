@@ -1,4 +1,4 @@
-use super::when::Expression;
+use super::when::{Expression, State};
 
 use crate::syntax::Id;
 use crate::syntax::Tool;
@@ -15,12 +15,4 @@ pub(crate) struct Unit {
 
     state: State,
     ok: Option<bool>,
-}
-
-#[derive(Debug)]
-enum State {
-    Start,
-    Finish,
-    Fail,
-    Watch,
 }

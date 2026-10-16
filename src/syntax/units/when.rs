@@ -7,6 +7,14 @@ enum Subject {
 }
 
 #[derive(Debug)]
+pub(super) enum State {
+    Start,
+    Finish,
+    Fail,
+    Watch,
+}
+
+#[derive(Debug)]
 pub(super) enum Expression {
     Subject(Subject),
 
