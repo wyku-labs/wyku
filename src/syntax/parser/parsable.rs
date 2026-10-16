@@ -1,6 +1,3 @@
-use crate::syntax::Tool;
-use crate::syntax::Unit;
-
 use toml::Table;
 
 pub(crate) trait Parsable<T> {

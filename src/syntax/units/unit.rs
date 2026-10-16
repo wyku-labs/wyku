@@ -3,8 +3,6 @@ use super::when::{Expression, State};
 use crate::syntax::Id;
 use crate::syntax::Tool;
 
-use regex::Regex;
-
 #[derive(Debug)]
 pub(crate) struct Unit {
     id: Id,
