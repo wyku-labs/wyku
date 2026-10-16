@@ -22,7 +22,6 @@ pub(super) enum Expression {
 
     AND([Box<Expression>; 2]),
     OR([Box<Expression>; 2]),
-    XOR([Box<Expression>; 2]),
 }
 
 impl Expression {
