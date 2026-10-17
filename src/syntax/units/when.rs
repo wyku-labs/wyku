@@ -1,12 +1,12 @@
 use crate::syntax::Id;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) enum Subject {
     Unit(Id, UnitState),
     Tool(Id),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) enum UnitState {
     Start,
     Finish,
@@ -14,7 +14,7 @@ pub(crate) enum UnitState {
     Watch,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) enum Expression {
     Subject(Subject),
     NOT(Box<Expression>),
