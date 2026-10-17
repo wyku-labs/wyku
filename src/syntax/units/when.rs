@@ -87,12 +87,17 @@ fn operator_parse(
             .ok_or(format!("expected a subject, got ''"));
     }
 
-    let construct = match rest[0] {
-        "AND" => Expression::AND,
-        "OR" => Expression::OR,
-        _ => return Err(format!("expected an operator, got '{}'", rest[0])),
-    };
+    match rest[0] {
+        "AND" => and_parse(expression, rest),
+        "OR" => or_parse(expression, rest),
+        _ => Err(format!("expected an operator, got '{}'", rest[0])),
+    }
+}
 
+fn or_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
     let left = expression
         .take()
         .ok_or(format!("operator {} missing arguments", rest[0]))?;
@@ -101,9 +106,42 @@ fn operator_parse(
 
     let right = subject_parse(expression, rest)?;
 
-    let built = construct((Box::new(left), Some(Box::new(right))));
+    *expression = Some(Expression::OR((Box::new(left), Some(Box::new(right)))));
+    operator_parse(expression, rest)
+}
 
-    *expression = Some(built);
+fn and_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
+    let left = expression
+        .take()
+        .ok_or(format!("operator {} missing arguments", rest[0]))?;
+
+    rest.remove(0);
+
+    let right = subject_parse(expression, rest)?;
+    *expression = Some(right);
+
+    while rest.first().copied() == Some("OR") {
+        let or_left = expression
+            .take()
+            .ok_or(format!("operator {} missing arguments", rest[0]))?;
+
+        rest.remove(0);
+
+        let or_right = subject_parse(expression, rest)?;
+        *expression = Some(Expression::OR((
+            Box::new(or_left),
+            Some(Box::new(or_right)),
+        )));
+    }
+
+    let right = expression
+        .take()
+        .ok_or(format!("operator AND missing arguments"))?;
+
+    *expression = Some(Expression::AND((Box::new(left), Some(Box::new(right)))));
     operator_parse(expression, rest)
 }
 
@@ -207,12 +245,9 @@ mod test {
 
         assert_eq!(
             Expression::parser("a:start OR b:finish AND c:fail OR d:watch").unwrap(),
-            Expression::OR((
-                Box::new(Expression::AND((
-                    Box::new(Expression::OR((Box::new(a), Some(Box::new(b))))),
-                    Some(Box::new(c)),
-                ))),
-                Some(Box::new(d)),
+            Expression::AND((
+                Box::new(Expression::OR((Box::new(a), Some(Box::new(b))))),
+                Some(Box::new(Expression::OR((Box::new(c), Some(Box::new(d)))))),
             ))
         );
     }
@@ -236,12 +271,12 @@ mod test {
 
         assert_eq!(
             Expression::parser("a:start AND NOT b:finish OR c:fail").unwrap(),
-            Expression::OR((
-                Box::new(Expression::AND((
-                    Box::new(a),
-                    Some(Box::new(Expression::NOT(Box::new(b)))),
-                ))),
-                Some(Box::new(c)),
+            Expression::AND((
+                Box::new(a),
+                Some(Box::new(Expression::OR((
+                    Box::new(Expression::NOT(Box::new(b))),
+                    Some(Box::new(c)),
+                )))),
             ))
         );
     }
