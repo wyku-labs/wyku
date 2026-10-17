@@ -2,12 +2,12 @@ use crate::syntax::Id;
 
 #[derive(Debug)]
 pub(crate) enum Subject {
-    Unit(Id, State),
+    Unit(Id, UnitState),
     Tool(Id),
 }
 
 #[derive(Debug)]
-pub(crate) enum State {
+pub(crate) enum UnitState {
     Start,
     Finish,
     Fail,
@@ -17,11 +17,17 @@ pub(crate) enum State {
 #[derive(Debug)]
 pub(crate) enum Expression {
     Subject(Subject),
-
     NOT(Box<Expression>),
+    AND((Box<Expression>, Option<Box<Expression>>)),
+    OR((Box<Expression>, Option<Box<Expression>>)),
+}
 
-    AND([Box<Expression>; 2]),
-    OR([Box<Expression>; 2]),
+#[derive(Debug)]
+pub(crate) enum States {
+    None,
+    Subject,
+    NOT,
+    Operator,
 }
 
 fn is_operator(operator: &str) -> bool {
@@ -60,7 +66,7 @@ impl Subject {
         if subject.contains(":") {
             if let Some(split) = subject.split_once(":") {
                 let (unit, state) = split;
-                return Ok(Subject::Unit(Id::new(unit)?, State::parser(state)?));
+                return Ok(Subject::Unit(Id::new(unit)?, UnitState::parser(state)?));
             }
         }
 
@@ -68,7 +74,7 @@ impl Subject {
     }
 }
 
-impl State {
+impl UnitState {
     pub(super) fn parser(state: &str) -> Result<Self, String> {
         match state {
             "start" => Ok(Self::Start),

@@ -1,4 +1,4 @@
-use crate::syntax::when::{Expression, State};
+use crate::syntax::when::{Expression, UnitState};
 
 use crate::syntax::Id;
 use crate::syntax::Tool;
@@ -11,6 +11,6 @@ pub(crate) struct Unit {
     when: Option<Expression>,
     tools: Option<Vec<Id>>,
 
-    state: State,
+    state: UnitState,
     ok: Option<bool>,
 }
