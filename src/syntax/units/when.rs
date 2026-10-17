@@ -24,10 +24,30 @@ pub(crate) enum Expression {
     OR([Box<Expression>; 2]),
 }
 
+fn is_operator(operator: &str) -> bool {
+    return match operator {
+        "NOT" | "AND" | "OR" => true,
+        _ => false,
+    };
+}
+
 impl Expression {
-    pub(super) fn parser(when: &str) -> Result<Expression, String> {
-        let id = Id::new(when)?;
-        Ok(Expression::Subject(Subject::Unit(id, State::Start))) // TODO: To work
+    pub(crate) fn parser(when: &str) -> Result<Expression, String> {
+        let when = when.trim();
+        let cutted: Vec<&str> = when.split(" ").collect();
+
+        if cutted.len() == 0 {
+            if when.chars().all(|c| c.is_uppercase()) {
+                return Err(format!("unknow {when} operator"));
+            }
+            if is_operator(when) {
+                return Err(format!("{when} missing arguments"));
+            }
+
+            return Ok(Expression::Subject(Subject::parser(when)?));
+        }
+
+        todo!()
     }
 }
 
