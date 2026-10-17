@@ -203,12 +203,16 @@ mod test {
         let a = Expression::Subject(Subject::parser("a:start").unwrap());
         let b = Expression::Subject(Subject::parser("b:finish").unwrap());
         let c = Expression::Subject(Subject::parser("c:fail").unwrap());
+        let d = Expression::Subject(Subject::parser("d:watch").unwrap());
 
         assert_eq!(
-            Expression::parser("a:start OR b:finish AND c:fail").unwrap(),
-            Expression::AND((
-                Box::new(Expression::OR((Box::new(a), Some(Box::new(b))))),
-                Some(Box::new(c)),
+            Expression::parser("a:start OR b:finish AND c:fail OR d:watch").unwrap(),
+            Expression::OR((
+                Box::new(Expression::AND((
+                    Box::new(Expression::OR((Box::new(a), Some(Box::new(b))))),
+                    Some(Box::new(c)),
+                ))),
+                Some(Box::new(d)),
             ))
         );
     }
