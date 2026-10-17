@@ -232,36 +232,25 @@ mod test {
     use super::*;
 
     #[test]
-    fn empty() {
-        assert!(Expression::parser("").is_err());
-    }
-
-    #[test]
-    fn not_alone() {
-        let alones = vec!["OR", "AND", "NOT"];
-        for i in alones {
+    fn rejected() {
+        for i in ["", "OR", "AND", "NOT"] {
             assert!(Expression::parser(i).is_err());
         }
     }
 
     #[test]
-    fn unit() {
-        let units = vec!["main:watch", "build:start", "build:fail"];
-        for i in units {
+    fn subject() {
+        for i in [
+            "main:watch",
+            "build:start",
+            "build:fail",
+            ":bash",
+            "curl",
+            "safe_command",
+        ] {
             assert_eq!(
                 Expression::parser(i).unwrap(),
                 Expression::Subject(Subject::parser(i).unwrap()),
-            );
-        }
-    }
-
-    #[test]
-    fn tool() {
-        let tools = vec![":bash", "curl", "safe_command"];
-        for i in tools {
-            assert_eq!(
-                Expression::parser(i).unwrap(),
-                Expression::Subject(Subject::parser(i).unwrap())
             );
         }
     }
@@ -278,9 +267,9 @@ mod test {
     }
 
     #[test]
-    fn not_nested() {
+    fn nested() {
         assert_eq!(
-            Expression::parser("NOT NOT dev:start").unwrap(),
+            Expression::parser("(((NOT NOT dev:start)))").unwrap(),
             Expression::NOT(Box::new(Expression::NOT(Box::new(Expression::Subject(
                 Subject::parser("dev:start").unwrap(),
             )))))
@@ -289,46 +278,47 @@ mod test {
 
     #[test]
     fn chain() {
-        let a = Expression::Subject(Subject::parser("a:start").unwrap());
-        let b = Expression::Subject(Subject::parser("b:finish").unwrap());
-        let c = Expression::Subject(Subject::parser("c:fail").unwrap());
-        let d = Expression::Subject(Subject::parser("d:watch").unwrap());
+        fn sub(s: &str) -> Expression {
+            Expression::Subject(Subject::parser(s).unwrap())
+        }
+        fn not(e: Expression) -> Expression {
+            Expression::NOT(Box::new(e))
+        }
+        fn and(l: Expression, r: Expression) -> Expression {
+            Expression::AND((Box::new(l), Some(Box::new(r))))
+        }
+        fn or(l: Expression, r: Expression) -> Expression {
+            Expression::OR((Box::new(l), Some(Box::new(r))))
+        }
 
-        assert_eq!(
-            Expression::parser("a:start OR b:finish AND c:fail OR d:watch").unwrap(),
-            Expression::AND((
-                Box::new(Expression::OR((Box::new(a), Some(Box::new(b))))),
-                Some(Box::new(Expression::OR((Box::new(c), Some(Box::new(d)))))),
-            ))
+        let parsed = Expression::parser(
+            "NOT ((a:start OR b:finish) AND NOT c:fail) OR (d:watch AND curl OR :bash) AND NOT NOT (e:start OR :bash AND f:finish) OR (NOT a:start AND (b:finish OR NOT (c:fail AND d:watch))) AND ((NOT curl OR a:start) AND NOT (b:finish OR c:fail))",
+        )
+        .unwrap();
+
+        let expected = and(
+            and(
+                or(
+                    not(and(or(sub("a:start"), sub("b:finish")), not(sub("c:fail")))),
+                    and(sub("d:watch"), or(sub("curl"), sub(":bash"))),
+                ),
+                or(
+                    not(not(and(
+                        or(sub("e:start"), sub(":bash")),
+                        sub("f:finish"),
+                    ))),
+                    and(
+                        not(sub("a:start")),
+                        or(sub("b:finish"), not(and(sub("c:fail"), sub("d:watch")))),
+                    ),
+                ),
+            ),
+            and(
+                or(not(sub("curl")), sub("a:start")),
+                not(or(sub("b:finish"), sub("c:fail"))),
+            ),
         );
-    }
 
-    #[test]
-    fn not_and() {
-        let a = Expression::Subject(Subject::parser("a:start").unwrap());
-        let b = Expression::Subject(Subject::parser("b:finish").unwrap());
-
-        assert_eq!(
-            Expression::parser("NOT a:start AND b:finish").unwrap(),
-            Expression::AND((Box::new(Expression::NOT(Box::new(a))), Some(Box::new(b)),))
-        );
-    }
-
-    #[test]
-    fn not_on_the_right() {
-        let a = Expression::Subject(Subject::parser("a:start").unwrap());
-        let b = Expression::Subject(Subject::parser("b:finish").unwrap());
-        let c = Expression::Subject(Subject::parser("c:fail").unwrap());
-
-        assert_eq!(
-            Expression::parser("a:start AND NOT b:finish OR c:fail").unwrap(),
-            Expression::AND((
-                Box::new(a),
-                Some(Box::new(Expression::OR((
-                    Box::new(Expression::NOT(Box::new(b))),
-                    Some(Box::new(c)),
-                )))),
-            ))
-        );
+        assert_eq!(parsed, expected);
     }
 }
