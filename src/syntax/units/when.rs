@@ -65,15 +65,15 @@ fn subject_parse(
     expression: &mut Option<Expression>,
     rest: &mut Vec<&str>,
 ) -> Result<Expression, String> {
-    let Some(word) = rest.first().copied() else {
+    if rest.is_empty() {
         return Err(format!("expected a Subject or NOT, got ''"));
-    };
+    }
 
-    if word == "NOT" {
+    if rest[0] == "NOT" {
         return not_parse(expression, rest);
     }
 
-    rest.remove(0);
+    let word = rest.remove(0);
     Ok(Expression::Subject(Subject::parser(word)?))
 }
 
@@ -81,21 +81,21 @@ fn operator_parse(
     expression: &mut Option<Expression>,
     rest: &mut Vec<&str>,
 ) -> Result<Expression, String> {
-    let Some(word) = rest.first().copied() else {
+    if rest.is_empty() {
         return expression
             .take()
-            .ok_or("expected a subject, got ''".to_string());
-    };
+            .ok_or(format!("expected a subject, got ''"));
+    }
 
-    let construct = match word {
+    let construct = match rest[0] {
         "AND" => Expression::AND,
         "OR" => Expression::OR,
-        _ => return Err(format!("expected an operator, got '{word}'")),
+        _ => return Err(format!("expected an operator, got '{}'", rest[0])),
     };
 
     let left = expression
         .take()
-        .ok_or("operator missing arguments".to_string())?;
+        .ok_or(format!("operator {} missing arguments", rest[0]))?;
 
     rest.remove(0);
 
