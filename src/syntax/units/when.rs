@@ -22,16 +22,39 @@ pub(crate) enum Expression {
     OR((Box<Expression>, Option<Box<Expression>>)),
 }
 
+fn push_split<'a>(rest: &mut Vec<&'a str>, word: &'a str) {
+    let mut start = 0;
+    for (i, c) in word.char_indices() {
+        if c == '(' || c == ')' {
+            if start < i {
+                rest.push(&word[start..i]);
+            }
+            let end = i + c.len_utf8();
+            rest.push(&word[i..end]);
+            start = end;
+        }
+    }
+    if start < word.len() {
+        rest.push(&word[start..]);
+    }
+}
+
 impl Expression {
     pub(crate) fn parser(when: &str) -> Result<Expression, String> {
-        let mut rest: Vec<&str> = when.trim().split_whitespace().collect();
+        let mut rest = Vec::new();
+        for word in when.trim().split_whitespace() {
+            push_split(&mut rest, word);
+        }
         if rest.is_empty() {
             return Err(format!("expression is empty"));
         }
 
         let mut expression: Option<Expression> = None;
-
-        none_parse(&mut expression, &mut rest)
+        let parsed = none_parse(&mut expression, &mut rest)?;
+        if !rest.is_empty() {
+            return Err(format!("expected an operator, got '{}'", rest[0]));
+        }
+        Ok(parsed)
     }
 }
 
@@ -73,15 +96,43 @@ fn subject_parse(
         return not_parse(expression, rest);
     }
 
+    if rest[0] == "(" {
+        return group_parse(expression, rest);
+    }
+
     let word = rest.remove(0);
     Ok(Expression::Subject(Subject::parser(word)?))
+}
+
+fn group_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
+    rest.remove(0);
+
+    if rest.is_empty() || rest[0] == ")" {
+        return Err(format!(
+            "expected a Subject or NOT, got '{}'",
+            rest.first().copied().unwrap_or("")
+        ));
+    }
+
+    let inner = none_parse(expression, rest)?;
+    if rest.first().copied() != Some(")") {
+        return Err(format!(
+            "expected ')', got '{}'",
+            rest.first().copied().unwrap_or("")
+        ));
+    }
+    rest.remove(0);
+    Ok(inner)
 }
 
 fn operator_parse(
     expression: &mut Option<Expression>,
     rest: &mut Vec<&str>,
 ) -> Result<Expression, String> {
-    if rest.is_empty() {
+    if rest.is_empty() || rest[0] == ")" {
         return expression
             .take()
             .ok_or(format!("expected a subject, got ''"));
