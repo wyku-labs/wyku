@@ -137,3 +137,108 @@ impl UnitState {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn empty() {
+        assert!(Expression::parser("").is_err());
+    }
+
+    #[test]
+    fn not_alone() {
+        let alones = vec!["OR", "AND", "NOT"];
+        for i in alones {
+            assert!(Expression::parser(i).is_err());
+        }
+    }
+
+    #[test]
+    fn unit() {
+        let units = vec!["main:watch", "build:start", "build:fail"];
+        for i in units {
+            assert_eq!(
+                Expression::parser(i).unwrap(),
+                Expression::Subject(Subject::parser(i).unwrap()),
+            );
+        }
+    }
+
+    #[test]
+    fn tool() {
+        let tools = vec![":bash", "curl", "safe_command"];
+        for i in tools {
+            assert_eq!(
+                Expression::parser(i).unwrap(),
+                Expression::Subject(Subject::parser(i).unwrap())
+            );
+        }
+    }
+
+    #[test]
+    fn not() {
+        let subjects = vec!["build:start", "my_command", ":bash", "main:watch"];
+        for i in subjects {
+            assert_eq!(
+                Expression::parser(&format!("NOT {i}")).unwrap(),
+                Expression::NOT(Box::new(Expression::Subject(Subject::parser(i).unwrap())))
+            );
+        }
+    }
+
+    #[test]
+    fn not_nested() {
+        assert_eq!(
+            Expression::parser("NOT NOT dev:start").unwrap(),
+            Expression::NOT(Box::new(Expression::NOT(Box::new(Expression::Subject(
+                Subject::parser("dev:start").unwrap(),
+            )))))
+        );
+    }
+
+    #[test]
+    fn chain() {
+        let a = Expression::Subject(Subject::parser("a:start").unwrap());
+        let b = Expression::Subject(Subject::parser("b:finish").unwrap());
+        let c = Expression::Subject(Subject::parser("c:fail").unwrap());
+
+        assert_eq!(
+            Expression::parser("a:start OR b:finish AND c:fail").unwrap(),
+            Expression::AND((
+                Box::new(Expression::OR((Box::new(a), Some(Box::new(b))))),
+                Some(Box::new(c)),
+            ))
+        );
+    }
+
+    #[test]
+    fn not_and() {
+        let a = Expression::Subject(Subject::parser("a:start").unwrap());
+        let b = Expression::Subject(Subject::parser("b:finish").unwrap());
+
+        assert_eq!(
+            Expression::parser("NOT a:start AND b:finish").unwrap(),
+            Expression::AND((Box::new(Expression::NOT(Box::new(a))), Some(Box::new(b)),))
+        );
+    }
+
+    #[test]
+    fn not_on_the_right() {
+        let a = Expression::Subject(Subject::parser("a:start").unwrap());
+        let b = Expression::Subject(Subject::parser("b:finish").unwrap());
+        let c = Expression::Subject(Subject::parser("c:fail").unwrap());
+
+        assert_eq!(
+            Expression::parser("a:start AND NOT b:finish OR c:fail").unwrap(),
+            Expression::OR((
+                Box::new(Expression::AND((
+                    Box::new(a),
+                    Some(Box::new(Expression::NOT(Box::new(b)))),
+                ))),
+                Some(Box::new(c)),
+            ))
+        );
+    }
+}
