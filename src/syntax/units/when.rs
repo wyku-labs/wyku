@@ -22,39 +22,89 @@ pub(crate) enum Expression {
     OR((Box<Expression>, Option<Box<Expression>>)),
 }
 
-#[derive(Debug)]
-pub(crate) enum States {
-    None,
-    Subject,
-    NOT,
-    Operator,
-}
-
-fn is_operator(operator: &str) -> bool {
-    return match operator {
-        "NOT" | "AND" | "OR" => true,
-        _ => false,
-    };
-}
-
 impl Expression {
     pub(crate) fn parser(when: &str) -> Result<Expression, String> {
-        let when = when.trim();
-        let cutted: Vec<&str> = when.split(" ").collect();
-
-        if cutted.len() == 0 {
-            if when.chars().all(|c| c.is_uppercase()) {
-                return Err(format!("unknow {when} operator"));
-            }
-            if is_operator(when) {
-                return Err(format!("{when} missing arguments"));
-            }
-
-            return Ok(Expression::Subject(Subject::parser(when)?));
+        let mut rest: Vec<&str> = when.trim().split_whitespace().collect();
+        if rest.is_empty() {
+            return Err(format!("expression is empty"));
         }
 
-        todo!()
+        let mut expression: Option<Expression> = None;
+
+        none_parse(&mut expression, &mut rest)
     }
+}
+
+fn none_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
+    if rest[0] == "AND" || rest[0] == "OR" {
+        return Err(format!("{} missing arguments", rest[0]));
+    }
+
+    let subject = subject_parse(expression, rest)?;
+    *expression = Some(subject);
+    operator_parse(expression, rest)
+}
+
+fn not_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
+    rest.remove(0);
+
+    if rest.is_empty() {
+        return Err(format!("NOT missing arguments"));
+    }
+
+    Ok(Expression::NOT(Box::new(subject_parse(expression, rest)?)))
+}
+
+fn subject_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
+    let Some(word) = rest.first().copied() else {
+        return Err(format!("expected a Subject or NOT, got ''"));
+    };
+
+    if word == "NOT" {
+        return not_parse(expression, rest);
+    }
+
+    rest.remove(0);
+    Ok(Expression::Subject(Subject::parser(word)?))
+}
+
+fn operator_parse(
+    expression: &mut Option<Expression>,
+    rest: &mut Vec<&str>,
+) -> Result<Expression, String> {
+    let Some(word) = rest.first().copied() else {
+        return expression
+            .take()
+            .ok_or("expected a subject, got ''".to_string());
+    };
+
+    let construct = match word {
+        "AND" => Expression::AND,
+        "OR" => Expression::OR,
+        _ => return Err(format!("expected an operator, got '{word}'")),
+    };
+
+    let left = expression
+        .take()
+        .ok_or("operator missing arguments".to_string())?;
+
+    rest.remove(0);
+
+    let right = subject_parse(expression, rest)?;
+
+    let built = construct((Box::new(left), Some(Box::new(right))));
+
+    *expression = Some(built);
+    operator_parse(expression, rest)
 }
 
 impl Subject {
